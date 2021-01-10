@@ -1,6 +1,6 @@
 package ru.digitalhabbits.homework3.dao;
 
-import org.apache.commons.lang3.NotImplementedException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.digitalhabbits.homework3.domain.Person;
 
@@ -10,6 +10,7 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class PersonDaoImpl
         implements PersonDao {
 
@@ -17,27 +18,35 @@ public class PersonDaoImpl
     private EntityManager entityManager;
 
     @Override
+    public Person create(@Nonnull Person entity) {
+        entityManager.persist(entity);
+        entityManager.flush();
+        return entity;
+    }
+
+    @Override
     public Person findById(@Nonnull Integer id) {
         // TODO: NotImplemented
-//        throw new NotImplementedException();
         return entityManager.find(Person.class, id);
     }
 
     @Override
     public List<Person> findAll() {
         // TODO: NotImplemented
-        throw new NotImplementedException();
+        return entityManager.createQuery("FROM Person", Person.class).getResultList();
     }
 
     @Override
     public Person update(Person entity) {
         // TODO: NotImplemented
-        throw new NotImplementedException();
+        return entityManager.merge(entity);
     }
 
     @Override
     public Person delete(Integer integer) {
         // TODO: NotImplemented
-        throw new NotImplementedException();
+        Person person = entityManager.find(Person.class, integer);
+        entityManager.remove(person);
+        return person;
     }
 }

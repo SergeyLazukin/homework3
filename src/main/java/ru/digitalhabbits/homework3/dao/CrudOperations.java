@@ -8,6 +8,8 @@ import java.util.List;
 @NoRepositoryBean
 public interface CrudOperations<T, ID> {
 
+    T create(@Nonnull T entity);
+
     T findById(@Nonnull ID id);
 
     List<T> findAll();

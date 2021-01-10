@@ -1,5 +1,6 @@
 package ru.digitalhabbits.homework3.dao;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Repository;
 import ru.digitalhabbits.homework3.domain.Department;
@@ -10,11 +11,17 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class DepartmentDaoImpl
         implements DepartmentDao {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Override
+    public Department create(@Nonnull Department entity) {
+        return null;
+    }
 
     @Override
     public Department findById(@Nonnull Integer integer) {
