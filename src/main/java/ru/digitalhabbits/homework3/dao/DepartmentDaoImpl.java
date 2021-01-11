@@ -20,25 +20,27 @@ public class DepartmentDaoImpl
 
     @Override
     public Department create(@Nonnull Department entity) {
-        return null;
+        entityManager.persist(entity);
+        entityManager.flush();
+        return entity;
     }
 
     @Override
     public Department findById(@Nonnull Integer integer) {
         // TODO: NotImplemented
-        throw new NotImplementedException();
+        return entityManager.find(Department.class, integer);
     }
 
     @Override
     public List<Department> findAll() {
         // TODO: NotImplemented
-        throw new NotImplementedException();
+        return entityManager.createQuery("FROM Department", Department.class).getResultList();
     }
 
     @Override
     public Department update(Department entity) {
         // TODO: NotImplemented
-        throw new NotImplementedException();
+        return entityManager.merge(entity);
     }
 
     @Override

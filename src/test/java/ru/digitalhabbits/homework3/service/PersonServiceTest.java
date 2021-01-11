@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import static java.util.stream.IntStream.range;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -76,6 +77,9 @@ class PersonServiceTest {
     void updatePerson() {
         // TODO: NotImplemented
         Person person = buildPerson();
+        Integer id = person.getId();
+        String fullNameOld = buildFullName(person);
+        Integer age = person.getAge();
         PersonRequest personRequest = new PersonRequest().setFirstName(randomAlphabetic(4));
         Person personLoad = new Person().setId(person.getId())
                 .setAge(personRequest.getAge() == null ? person.getAge() : personRequest.getAge())
@@ -88,10 +92,14 @@ class PersonServiceTest {
 
         PersonResponse personResponse = personService.updatePerson(person.getId(), personRequest);
 
-        assertEquals(person.getId(), personResponse.getId());
-        assertEquals(person.getAge(), personResponse.getAge());
-        assertEquals(buildFullName(person.getFirstName(), person.getMiddleName(), person.getLastName()),
-                personResponse.getFullName());
+        assertEquals(personResponse.getId(), id);
+        assertEquals(personResponse.getAge(), age);
+        assertNotEquals(personResponse.getFullName(), fullNameOld);
+
+//        assertEquals(person.getId(), personResponse.getId());
+//        assertEquals(person.getAge(), personResponse.getAge());
+//        assertEquals(buildFullName(person.getFirstName(), person.getMiddleName(), person.getLastName()),
+//                personResponse.getFullName());
     }
 
     @Test
