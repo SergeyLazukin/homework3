@@ -3,10 +3,10 @@ package ru.digitalhabbits.homework3.service;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.digitalhabbits.homework3.dao.DepartmentDao;
 import ru.digitalhabbits.homework3.domain.Department;
 import ru.digitalhabbits.homework3.domain.Person;
-import ru.digitalhabbits.homework3.model.DepartmentInfo;
 import ru.digitalhabbits.homework3.model.DepartmentRequest;
 import ru.digitalhabbits.homework3.model.DepartmentResponse;
 import ru.digitalhabbits.homework3.model.DepartmentShortResponse;
@@ -25,6 +25,7 @@ public class DepartmentServiceImpl
     private final DepartmentDao departmentDao;
 
     @Nonnull
+    @Transactional
     @Override
     public List<DepartmentShortResponse> findAllDepartments() {
         // TODO: NotImplemented: получение краткой информации о всех департаментах
@@ -35,6 +36,7 @@ public class DepartmentServiceImpl
     }
 
     @Nonnull
+    @Transactional
     @Override
     public DepartmentResponse getDepartment(@Nonnull Integer id) {
         // TODO: NotImplemented: получение подробной информации о департаменте и краткой информации о людях в нем.
@@ -51,6 +53,7 @@ public class DepartmentServiceImpl
     }
 
     @Nonnull
+    @Transactional
     @Override
     public Integer createDepartment(@Nonnull DepartmentRequest request) {
         // TODO: NotImplemented: создание нового департамента
@@ -59,6 +62,7 @@ public class DepartmentServiceImpl
     }
 
     @Nonnull
+    @Transactional
     @Override
     public DepartmentResponse updateDepartment(@Nonnull Integer id, @Nonnull DepartmentRequest request) {
         // TODO: NotImplemented: обновление данных о департаменте. Если не найдено, отдавать 404:NotFound
@@ -75,13 +79,24 @@ public class DepartmentServiceImpl
                             .collect(Collectors.toList()));
     }
 
+    @Transactional
     @Override
     public void deleteDepartment(@Nonnull Integer id) {
         // TODO: NotImplemented: удаление всех людей из департамента и удаление самого департамента.
         //  Если не найдено, то ничего не делать
-        throw new NotImplementedException();
+        Optional<Department> optional = Optional.ofNullable(departmentDao.findById(id));
+        if(optional.isPresent()) {
+            Department department = optional.get();
+            List<Person> personList = department.getPeople();
+            for(Person person : personList) {
+                person.setDepartment(null);
+            }
+            departmentDao.update(department);
+            departmentDao.delete(department.getId());
+        }
     }
 
+    @Transactional
     @Override
     public void addPersonToDepartment(@Nonnull Integer departmentId, @Nonnull Integer personId) {
         // TODO: NotImplemented: добавление нового человека в департамент.
@@ -90,6 +105,7 @@ public class DepartmentServiceImpl
         throw new NotImplementedException();
     }
 
+    @Transactional
     @Override
     public void removePersonToDepartment(@Nonnull Integer departmentId, @Nonnull Integer personId) {
         // TODO: NotImplemented: удаление человека из департамента.
@@ -97,6 +113,7 @@ public class DepartmentServiceImpl
         throw new NotImplementedException();
     }
 
+    @Transactional
     @Override
     public void closeDepartment(@Nonnull Integer id) {
         // TODO: NotImplemented: удаление всех людей из департамента и установка отметки на департаменте,

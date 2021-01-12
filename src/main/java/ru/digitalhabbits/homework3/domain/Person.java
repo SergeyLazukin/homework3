@@ -1,6 +1,8 @@
 package ru.digitalhabbits.homework3.domain;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.Column;
@@ -12,6 +14,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Data
+@EqualsAndHashCode(exclude = "department")
+@ToString(exclude = "department")
 @Accessors(chain = true)
 @Entity
 @Table(name = "person")

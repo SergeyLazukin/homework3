@@ -12,7 +12,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import ru.digitalhabbits.homework3.domain.Department;
+import ru.digitalhabbits.homework3.domain.Person;
 import ru.digitalhabbits.homework3.util.DepartmentHelper;
+import ru.digitalhabbits.homework3.util.PersonHelper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static ru.digitalhabbits.homework3.util.DepartmentHelper.buildDepartment;
 
 @ExtendWith(SpringExtension.class)
@@ -85,5 +88,29 @@ class DepartmentDaoImplTest {
     @Test
     void delete() {
         // TODO: NotImplemented
+        List<Person> personList = IntStream.range(0, COUNT).mapToObj(i -> PersonHelper.buildPersonWithoutId())
+                .map(item -> entityManager.persist(item))
+                .collect(Collectors.toList());
+
+        Department department = departments.get(0);
+        for(Person person : personList) {
+            person.setDepartment(department);
+        }
+        department.setPeople(personList);
+        entityManager.merge(department);
+
+        Department departmentFound = entityManager.find(Department.class, departments.get(0).getId());
+        List<Person> people = department.getPeople();
+        Person person = people.get(0);
+
+        assertNotNull(person.getDepartment());
+
+        Department departmentDeleted = departmentDao.delete(departmentFound.getId());
+        Department departmentNotFound = departmentDao.findById(departmentDeleted.getId());
+        entityManager.refresh(person);
+
+        assertNull(departmentNotFound);
+        assertNull(person.getDepartment());
+
     }
 }

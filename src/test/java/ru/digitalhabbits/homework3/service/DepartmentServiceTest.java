@@ -9,10 +9,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.digitalhabbits.homework3.dao.DepartmentDao;
 import ru.digitalhabbits.homework3.domain.Department;
+import ru.digitalhabbits.homework3.domain.Person;
 import ru.digitalhabbits.homework3.model.DepartmentRequest;
 import ru.digitalhabbits.homework3.model.DepartmentResponse;
 import ru.digitalhabbits.homework3.model.DepartmentShortResponse;
 import ru.digitalhabbits.homework3.util.DepartmentHelper;
+import ru.digitalhabbits.homework3.util.PersonHelper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -100,6 +104,25 @@ class DepartmentServiceTest {
     @Test
     void deleteDepartment() {
         // TODO: NotImplemented
+        Department department = departments.get(0);
+        List<Person> personList = IntStream.range(0,2)
+                .mapToObj(i -> PersonHelper.buildPersonWithoutId(department).setId(i))
+                .collect(Collectors.toList());
+
+        for(Person person : personList) {
+            person.setDepartment(department);
+        }
+        department.setPeople(personList);
+
+        Integer id = department.getId();
+
+        when(departmentDao.findById(any(Integer.class))).thenReturn(department);
+//        when(departmentDao.delete(any(Integer.class))).thenReturn(department);
+
+        departmentService.deleteDepartment(department.getId());
+        verify(departmentDao, times(1)).findById(id);
+        verify(departmentDao, times(1)).update(department);
+        verify(departmentDao, times(1)).delete(id);
     }
 
     @Test

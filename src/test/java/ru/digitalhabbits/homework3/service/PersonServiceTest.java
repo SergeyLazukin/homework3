@@ -95,11 +95,6 @@ class PersonServiceTest {
         assertEquals(personResponse.getId(), id);
         assertEquals(personResponse.getAge(), age);
         assertNotEquals(personResponse.getFullName(), fullNameOld);
-
-//        assertEquals(person.getId(), personResponse.getId());
-//        assertEquals(person.getAge(), personResponse.getAge());
-//        assertEquals(buildFullName(person.getFirstName(), person.getMiddleName(), person.getLastName()),
-//                personResponse.getFullName());
     }
 
     @Test

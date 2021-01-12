@@ -46,6 +46,8 @@ public class DepartmentDaoImpl
     @Override
     public Department delete(Integer integer) {
         // TODO: NotImplemented
-        throw new NotImplementedException();
+        Department department = entityManager.find(Department.class, integer);
+        entityManager.remove(department);
+        return department;
     }
 }

@@ -1,8 +1,11 @@
 package ru.digitalhabbits.homework3.domain;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(exclude = "people")
+@ToString(exclude = "people")
 @Accessors(chain = true)
 @Entity
 @Table(name = "department")
@@ -29,6 +34,7 @@ public class Department {
     @Column(nullable = false, columnDefinition = "BOOL NOT NULL DEFAULT FALSE")
     private boolean closed;
 
-    @OneToMany(mappedBy = "department")
+    @OneToMany(mappedBy = "department",
+                cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Person> people = new ArrayList<>();
 }
