@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.digitalhabbits.homework3.dao.DepartmentDao;
+import ru.digitalhabbits.homework3.dao.PersonDao;
 import ru.digitalhabbits.homework3.domain.Department;
 import ru.digitalhabbits.homework3.domain.Person;
 import ru.digitalhabbits.homework3.model.DepartmentRequest;
@@ -24,6 +25,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -35,6 +38,9 @@ class DepartmentServiceTest {
 
     @MockBean
     private DepartmentDao departmentDao;
+
+    @MockBean
+    private PersonDao personDao;
 
     @Autowired
     private DepartmentService departmentService;
@@ -105,21 +111,18 @@ class DepartmentServiceTest {
     void deleteDepartment() {
         // TODO: NotImplemented
         Department department = departments.get(0);
-        List<Person> personList = IntStream.range(0,2)
+        List<Person> personList = IntStream.range(3,5)
                 .mapToObj(i -> PersonHelper.buildPersonWithoutId(department).setId(i))
                 .collect(Collectors.toList());
-
         for(Person person : personList) {
             person.setDepartment(department);
         }
         department.setPeople(personList);
-
         Integer id = department.getId();
-
         when(departmentDao.findById(any(Integer.class))).thenReturn(department);
-//        when(departmentDao.delete(any(Integer.class))).thenReturn(department);
-
         departmentService.deleteDepartment(department.getId());
+
+        assertNull(personList.get(0).getDepartment());
         verify(departmentDao, times(1)).findById(id);
         verify(departmentDao, times(1)).update(department);
         verify(departmentDao, times(1)).delete(id);
@@ -128,15 +131,54 @@ class DepartmentServiceTest {
     @Test
     void addPersonToDepartment() {
         // TODO: NotImplemented
+        Department department = departments.get(0);
+        Person person = PersonHelper.buildPersonWithoutId(department).setId(5);
+        department.getPeople().add(person);
+        Person newPerson = PersonHelper.buildPersonWithoutId().setId(6);
+
+        when(departmentDao.findById(any(Integer.class))).thenReturn(department);
+        when(personDao.findById(any(Integer.class))).thenReturn(newPerson);
+        departmentService.addPersonToDepartment(department.getId(), person.getId());
+
+        assertEquals(2, department.getPeople().size());
+        assertEquals(newPerson, department.getPeople().get(1));
+        verify(departmentDao, times(1)).update(department);
     }
 
     @Test
     void removePersonToDepartment() {
         // TODO: NotImplemented
+        Department department = departments.get(0);
+        Person person = PersonHelper.buildPersonWithoutId(department).setId(5);
+        department.getPeople().add(person);
+
+        when(departmentDao.findById(any(Integer.class))).thenReturn(department);
+        when(personDao.findById(any(Integer.class))).thenReturn(person);
+        departmentService.removePersonToDepartment(department.getId(), person.getId());
+
+        assertEquals(0, department.getPeople().size());
+        assertNull(person.getDepartment());
+        verify(departmentDao, times(1)).update(department);
     }
 
     @Test
     void closeDepartment() {
         // TODO: NotImplemented
+        Department department = departments.get(0);
+        List<Person> personList = IntStream.range(3,5)
+                .mapToObj(i -> PersonHelper.buildPersonWithoutId(department).setId(i))
+                .collect(Collectors.toList());
+        for(Person person : personList) {
+            person.setDepartment(department);
+        }
+        department.setPeople(personList);
+        Person p = personList.get(0);
+        when(departmentDao.findById(any(Integer.class))).thenReturn(department);
+        departmentService.closeDepartment(department.getId());
+
+        assertEquals(0, department.getPeople().size());
+        assertTrue(department.isClosed());
+        assertNull(p.getDepartment());
+        verify(departmentDao, times(1)).update(department);
     }
 }
