@@ -30,7 +30,7 @@ jobs:
         uses: akhileshns/heroku-deploy@v3.4.6
         with:
           # TODO set Heroku app name and user email
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_api_key: fd6c1a38-585b-4909-ad64-7a84e7841bed
           heroku_app_name: homework3-lazukin
           heroku_email: lazykun@mail.ru
       - name: Checkout test repository
